@@ -25,12 +25,19 @@ const getAllPlayersFromDb = () => new Promise((resolve, reject) => {
 });
 
 const getPlayersByTeam = teamId => new Promise((resolve, reject) => {
-  axios
-    .get(`${baseUrl}/players.json`)
-    .then((data) => {
-      const allPlayers = data.data;
-      const correctPlayers = allPlayers.filter(x => x.teamId === teamId);
-      resolve(correctPlayers);
+  axios.get(`${baseUrl}/players.json?orderBy="teamId"&equalTo="${teamId}"`)
+    .then((result) => {
+      const allPlayersObject = result.data;
+      const allplayersArray = [];
+      if (allPlayersObject != null) {
+        Object.keys(allPlayersObject).forEach((playerId) => {
+          const newPlayer = allPlayersObject[playerId];
+          newPlayer.id = playerId;
+          allplayersArray.push(newPlayer);
+        });
+      }
+
+      resolve(allplayersArray);
     })
     .catch((err) => {
       reject(err);
