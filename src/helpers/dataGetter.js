@@ -1,10 +1,34 @@
 import axios from 'axios';
+// import { promises } from 'fs';
+import apiKeys from '../../db/apiKeys.json';
 
-const getAllPlayersFromDb = () => axios.get('http://localhost:3003/players');
+const baseUrl = apiKeys.firebaseKeys.databaseURL;
+
+const getAllPlayersFromDb = () => new Promise((resolve, reject) => {
+
+  axios.get(`${baseUrl}/players.json`)
+    .then((result) => {
+      const allPlayersObject = result.data;
+      const allplayersArray = [];
+      if (allPlayersObject != null) {
+        Object.keys(allPlayersObject).forEach((playerId) => {
+          const newPlayer = allPlayersObject[playerId];
+          newPlayer.id = playerId;
+          allplayersArray.push(newPlayer);
+        });
+      }
+      console.log('array?', allplayersArray);
+
+      resolve(allplayersArray);
+    })
+    .catch((err) => {
+      reject(err);
+    });
+});
 
 const getPlayersByTeam = teamId => new Promise((resolve, reject) => {
   axios
-    .get('http://localhost:3003/players')
+    .get(`${baseUrl}/players.json`)
     .then((data) => {
       const allPlayers = data.data;
       const correctPlayers = allPlayers.filter(x => x.teamId === teamId);
@@ -15,9 +39,9 @@ const getPlayersByTeam = teamId => new Promise((resolve, reject) => {
     });
 });
 
-const getAllTeamsFromDb = () => axios.get('http://localhost:3003/teams');
+const getAllTeamsFromDb = () => axios.get(`${baseUrl}/teams.json`);
 
-const getAllPositionsFromDb = () => axios.get('http://localhost:3003/positions');
+const getAllPositionsFromDb = () => axios.get(`${baseUrl}/positions.json`);
 
 const getFullPlayerInfo = players => Promise.all([getAllTeamsFromDb(), getAllPositionsFromDb()])
   .then((dataArray) => {
