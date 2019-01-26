@@ -36,7 +36,7 @@ const getAndPrintAllPlayers = () => {
 
 const initializeApp = () => {
   firebase.initializeApp(apiKeys.firebaseKeys);
-  console.log('apiKeys', apiKeys);
+  // console.log('apiKeys', apiKeys);
   loadNavbar();
   getAndPrintTeamButtonGroup();
   getAndPrintAllPlayers();
